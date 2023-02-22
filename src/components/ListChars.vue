@@ -108,6 +108,7 @@ const cutName = (str: string): string => {
 .charName {
   font-size: 0.5rem;
   font-weight: bold;
+  color: black;
 }
 @media (min-width: 768px) {
   .charName {
