@@ -4,28 +4,58 @@ import ContainerChars from "./components/ContainerChars.vue";
 
 <template>
   <header>
-    <div><h1 class="">Rick and Morty fun page</h1></div>
+    <div class="title"><h2>Rick and Morty fun page</h2></div>
   </header>
-  <div class="CharList">
+  <div class="container">
     <ContainerChars />
   </div>
+  <footer>Rick&Morty</footer>
 </template>
 
 <style scoped>
 header {
-  display: flex;
-  justify-content: space-evenly;
-  line-height: 1.5;
-  /* max-height: 10vh; */
+  width: 100%;
+  margin: 0 auto;
+  line-height: 1;
   background-color: var(--vt-c-bgc-elem);
   color: var(--vt-c-bgc-h1);
 }
-/* 
+@media (min-width: 760px) {
+  header {
+    line-height: 1.5;
+  }
+}
 @media (min-width: 1024px) {
   header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
+    width: 1024px;
+    line-height: 1.5;
+  }
+}
+.title {
+  text-align: center;
+}
+.container {
+  width: 100%;
+  margin: 0 auto;
+}
+@media (min-width: 1024px) {
+  .container {
+    width: 1024px;
+    margin: 5px auto;
+  }
+}
+footer {
+  display: block;
+  text-align: center;
+  background-color: var(--vt-c-divider-dark-1);
+  color: var(--vt-c-white-mute);
+}
+/* @media (min-width: 1024px) {
+  footer {
+    display: block;
+    text-align: center;
+    background-color: var(--vt-c-divider-dark-1);
+    color: var(--vt-c-white-mute);
   }
 } */
 </style>

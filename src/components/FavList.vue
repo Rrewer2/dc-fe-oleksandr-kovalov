@@ -1,5 +1,5 @@
 <template>
-  <div v-if="props.favoriteChars.length > 0">
+  <div v-if="props.favoriteChars.length > 0" class="favContainer">
     <div :class="props.favoriteChars.length < 8 ? 'favList' : 'favList-long'">
       <div
         v-for="favChar in props.favoriteChars"
@@ -8,7 +8,7 @@
       >
         <div><img :src="favChar.image" :alt="favChar.name" /></div>
         <div>
-          <div class="favItemName">{{ favChar.name }}</div>
+          <div class="favItemName">{{ cutName(favChar.name) }}</div>
         </div>
         <div>
           <button @click="props.removeFromFavorites(favChar)" class="remove">
@@ -19,7 +19,7 @@
     </div>
   </div>
   <div v-else>
-    <p>You have no yet favorite characters.</p>
+    <div class="noFavChars">You have no favorite characters.</div>
   </div>
 </template>
 <script setup lang="ts">
@@ -34,23 +34,28 @@ const props = defineProps({
     required: true,
   },
 });
+const cutName = (str: string): string => {
+  if (str.length > 19) return str.slice(0, 16) + "...";
+  return str;
+};
 </script>
 <style scoped>
+.favContainer {
+  width: 100%;
+}
 .favList {
-  height: 300px;
+  height: 20rem;
+  width: 90%;
 }
 .favList-long {
-  height: 300px;
+  height: 20rem;
   overflow-y: scroll;
 }
 .favItem {
-  width: 100%;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  background-color: var(--vt-c-text-dark-2);
-  /* margin: 0.5rem 0; */
   text-align: center;
   margin: 3px 0;
   font-size: 10px;
@@ -58,10 +63,16 @@ const props = defineProps({
 .favItem img {
   width: 2rem;
   height: 2rem;
+  border-radius: 1rem;
 }
 .favItemName {
   font-weight: bold;
-  margin-top: 0.5rem;
+  color: #000000;
+}
+@media (min-width: 768px) {
+  .favItemName {
+    font-size: 1rem;
+  }
 }
 .remove {
   background: none;
@@ -76,5 +87,15 @@ const props = defineProps({
 }
 .remove:focus {
   outline: none;
+}
+.noFavChars {
+  padding-top: 1rem;
+  font-size: 0.75rem;
+  color: #7d4545;
+}
+@media (min-width: 768px) {
+  .noFavChars {
+    font-size: 1rem;
+  }
 }
 </style>

@@ -1,12 +1,12 @@
 <template>
-  <div>Find the character:</div>
   <div class="inputWrap">
     <input
       type="text"
       v-model="query"
       placeholder="Enter name"
       :onblur="errorClean"
-    /><button @click="cleanQuary" class="findCleen">&times;</button>
+    />
+    <button @click="cleanQuary" class="findCleen">&times;</button>
   </div>
   <div v-if="loading">Loading...</div>
   <div v-else-if="err" class="error">Nothing found</div>
@@ -57,23 +57,28 @@ watchEffect(() => {
   display: flex;
 }
 input {
-  font-size: 16px;
+  font-size: 1rem;
   /* padding: 0.5rem; */
   border: 0.1rem solid #ccc;
   border-radius: 0.3rem;
-  width: 85%;
+  width: 65%;
   outline: none;
 }
-
 input::placeholder {
   color: #999;
+  font-size: 0.75rem;
 }
-
+@media (min-width: 768px) {
+  input::placeholder {
+    color: #999;
+    font-size: 1rem;
+  }
+}
 input:focus {
   border-color: #5cb85c;
 }
 .error {
-  color: red;
+  color: #7d4545;
 }
 .findCleen {
   width: 15%;

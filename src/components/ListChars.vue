@@ -13,7 +13,7 @@
       <div class="imageContainer">
         <img :src="char.image" :alt="char.name + ' image'" />
       </div>
-      <div class="charName">{{ char.name }}</div>
+      <div class="charName">{{ cutName(char.name) }}</div>
       <div>
         <!-- <button @click="props.addToFavorites(char)">♥</button> -->
       </div>
@@ -45,33 +45,53 @@ const props = defineProps({
 const isFav = (char: Character) => {
   return props.favoriteChars.findIndex((item) => item.id === char.id) > -1;
 };
+const cutName = (str: string): string => {
+  if (str.length > 16) return str.slice(0, 13) + "...";
+  return str;
+};
 </script>
 <style scoped>
 .characters {
   cursor: pointer;
   display: flex;
   flex-wrap: wrap;
-  /* justify-content: space-evenly; */
-  /* width: 95%; */
   align-content: flex-start;
-  /* align-items: flex-start; */
-  /* height: 500px;
-  overflow-y: scroll; */
-  min-height: 100vh;
+}
+@media (min-width: 1024px) {
+  .characters {
+    min-height: 100vh;
+  }
 }
 .character {
-  width: 18%;
+  width: 42%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   background-color: var(--vt-c-text-dark-2);
-  margin: 1%;
+  margin: 4%;
   text-align: center;
   border-radius: 4%;
-  /* width: 6rem; */
+}
+@media (min-width: 420px) {
+  .character {
+    width: 28%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: var(--vt-c-text-dark-2);
+    margin: 2%;
+    text-align: center;
+    border-radius: 4%;
+  }
+}
+@media (min-width: 768px) {
+  .character {
+    width: 21%;
+    margin: 2%;
+  }
 }
 .character:active {
-  background-color: aqua;
+  background-color: #4caf50;
 }
 .imageContainer {
   width: 100%;
@@ -79,7 +99,6 @@ const isFav = (char: Character) => {
 }
 .character img {
   width: 100%;
-  height: 100%;
   border-radius: 5%;
 }
 .fav {
@@ -87,8 +106,13 @@ const isFav = (char: Character) => {
   box-shadow: 0.3rem 0.3rem 20px rgba(222, 196, 132, 0.5);
 }
 .charName {
+  font-size: 0.5rem;
   font-weight: bold;
-  /* margin-top: 0.3rem; */
+}
+@media (min-width: 768px) {
+  .charName {
+    font-size: 1rem;
+  }
 }
 .heart {
   position: absolute;

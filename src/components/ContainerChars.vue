@@ -2,15 +2,12 @@
   <div class="ContainerChars">
     <div class="charsWrapper">
       <div v-if="characters.length > 0">
-        <div class="buttons">
-          <button class="prev" @click="prevPage" :disabled="isFinding">
-            ←
-          </button>
+        <div v-if="!isFinding" class="buttons">
+          <button class="prev" @click="prevPage">←</button>
           <div class="pageNumber">{{ currentPage }}</div>
-          <button class="next" @click="nextPage" :disabled="isFinding">
-            →
-          </button>
+          <button class="next" @click="nextPage">→</button>
         </div>
+        <div v-else class="searchResults">Search results:</div>
         <ListChars
           :characters="isFinding ? findedChars : characters"
           :addToFavorites="addToFavorites"
@@ -19,18 +16,19 @@
         />
       </div>
       <div v-else>
-        <p>No characters found.</p>
+        <p class="searchError">No characters found :(</p>
       </div>
     </div>
-    <div class="favWrapper">
-      <h2>Favorite Characters</h2>
-      <div class="height300">
+    <div class="favAndFindWrapper">
+      <div class="favouriteTitle">Favorite Characters</div>
+      <div class="favItems">
         <FavList
           :favoriteChars="favoriteChars"
           :removeFromFavorites="removeFromFavorites"
         />
       </div>
-      <div class="FindCharWrapper">
+      <div class="findTitle">Find the character:</div>
+      <div class="findWrapper">
         <FindChar @fch="fch" @finding="finding" />
       </div>
     </div>
@@ -72,39 +70,19 @@ const fch = (data: Character[]) => {
 const finding = (data: boolean) => {
   isFinding.value = data;
 };
-// const length = 826;
-// let count = 1;
-// const step = 20;
-// const getArr = (num: number): number[] => {
-//   let arr: number[] = [];
-//   if (num > length - step) num = 0;
-//   for (let i = num; i < num + step; i++) {
-//     arr.push(i);
-//     count = i;
-//   }
-//   count++;
-//   return arr;
-// };
 const fetchData = async () => {
   const response = await axios.get<{
     info: { pages: number };
     results: Character[];
-  }>(
-    // `https://rickandmortyapi.com/api/character/?page=${getArr(count).join(
-    //   ","
-    // )}`
-    `https://rickandmortyapi.com/api/character/?page=${currentPage.value}`
-  );
+  }>(`https://rickandmortyapi.com/api/character/?page=${currentPage.value}`);
   characters.value = response.data.results;
   maxPage.value = response.data.info.pages;
 };
 fetchData();
 
 const addToFavorites = (character: Character) => {
-  const favoriteCharacter = favoriteChars.value.find(
-    (c) => c.id === character.id
-  );
-  if (!favoriteCharacter) {
+  const newCharacter = favoriteChars.value.find((c) => c.id === character.id);
+  if (!newCharacter) {
     favoriteChars.value.push({
       id: character.id,
       name: character.name,
@@ -122,7 +100,7 @@ const removeFromFavorites = (character: Character) => {
     favoriteChars.value.splice(index, 1);
     localStorage.setItem(
       "favoriteCharacters",
-      JSON.stringify(favoriteChars.value.map((item) => item.name))
+      JSON.stringify(favoriteChars.value)
     );
   }
 };
@@ -138,25 +116,32 @@ const prevPage = () => {
 };
 </script>
 
-<style>
-/* .app {
-  padding-right: 17px;
-}
-.app {
-  padding-right: 0px;
-} */
-
+<style scoped>
 .ContainerChars {
   width: 100%;
   display: flex;
-  /* flex-direction: column; */
   align-items: flex-start;
-  /* justify-content: center; */
 }
-
+@media (min-width: 1024px) {
+  .ContainerChars {
+    width: 1024px;
+  }
+}
 .charsWrapper {
-  width: 75%;
-  padding-right: 2rem;
+  width: 60%;
+  padding-right: 0.5rem;
+}
+@media (min-width: 420px) {
+  .charsWrapper {
+    width: 75%;
+    padding-right: 0.5rem;
+  }
+}
+@media (min-width: 1024px) {
+  .charsWrapper {
+    /* width: 75%; */
+    padding-right: 2rem;
+  }
 }
 .buttons {
   display: flex;
@@ -164,43 +149,68 @@ const prevPage = () => {
   justify-content: center;
 }
 .pageNumber {
-  width: 10%;
+  width: 35%;
   text-align: center;
   margin: 0;
+  color: black;
+  font-weight: 500;
+}
+@media (min-width: 420px) {
+  .pageNumber {
+    width: 10%;
+  }
 }
 button {
   border: none;
   background-color: #4caf50;
   color: white;
-  /* font-size: larger; */
   padding: 0.1rem 1rem;
   border-radius: 0.2rem;
   cursor: pointer;
-}
-button[disabled] {
-  opacity: 0.5;
-  cursor: not-allowed;
 }
 button.prev:active,
 button.next:active {
   transform: translateY(0.02rem);
 }
-.page-number {
-  margin: 0 8px;
-  font-size: 16px;
-}
-
-.favWrapper {
-  width: 25%;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  flex-direction: column;
-}
-.height300 {
-  height: 300px;
-}
-h2 {
+.searchResults {
   text-align: center;
+  color: var(--vt-c-bgc-h1);
+}
+.searchError {
+  text-align: center;
+  color: #7d4545;
+}
+.favAndFindWrapper {
+  width: 40%;
+}
+@media (min-width: 420px) {
+  .favAndFindWrapper {
+    width: 25%;
+  }
+}
+.favouriteTitle {
+  width: 100%;
+  text-align: center;
+  color: var(--vt-c-bgc-h1);
+}
+@media (min-width: 670px) {
+  .favouriteTitle {
+    font-size: 1.5rem;
+  }
+}
+.favItems {
+  /* background-color: #fff;
+  border: 0.1rem solid #ccc;
+  border-radius: 0.3rem; */
+  width: 100%;
+  height: 20rem;
+}
+.findTitle {
+  text-align: center;
+  margin-top: 1rem;
+  color: var(--vt-c-bgc-h1);
+}
+.findWrapper {
+  width: 100%;
 }
 </style>
