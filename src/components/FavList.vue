@@ -3,7 +3,9 @@
   <article v-if="props.favoriteChars.length">
     <div
       class="fav-list"
-      :class="{ 'fav-list-long': props.favoriteChars.length > 6 }"
+      :class="{
+        'fav-list-long': props.favoriteChars.length > maxFavLength,
+      }"
     >
       <div
         v-for="{ id, name, image } in props.favoriteChars"
@@ -39,6 +41,7 @@ const props = defineProps({
   },
 });
 const { cutName } = useName();
+const maxFavLength = 6;
 </script>
 <style scoped>
 .fav-title {
@@ -56,7 +59,6 @@ const { cutName } = useName();
   transition: 3s linear;
 }
 .fav-list-long {
-  height: 20rem;
   overflow-y: scroll;
 }
 .fav-item {
