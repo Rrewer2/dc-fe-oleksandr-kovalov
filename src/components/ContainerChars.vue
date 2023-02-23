@@ -30,30 +30,26 @@ import axios from "axios";
 import ListChars from "./ListChars.vue";
 import FavList from "./FavList.vue";
 import FindChar from "./FindChar.vue";
+import useFindIndex from "@/composables/useFindIndex";
+import type { ICharacter } from "@/interfaces/interfaces";
 
-export interface Character {
-  id: number;
-  name: string;
-  image: string;
-}
-
-const characters = ref<Character[]>([]);
-const favoriteChars = ref<Character[]>([]);
-const findedChars = ref<Character[]>([]);
+const characters = ref<ICharacter[]>([]);
+const favoriteChars = ref<ICharacter[]>([]);
+const findedChars = ref<ICharacter[]>([]);
 const currentPage = ref(1);
 const maxPage = ref(42);
 const isFinding = ref(false);
 
-const storedChars = localStorage.getItem("favoriteCharacters");
+const storedChars = localStorage.getItem("favoriteICharacters");
 if (storedChars) {
   try {
-    favoriteChars.value = JSON.parse(storedChars) as Character[];
+    favoriteChars.value = JSON.parse(storedChars) as ICharacter[];
   } catch (error) {
     console.error("Error parsing localStorage value:", error);
   }
 }
 
-const charsArray = (arr: Character[]) => {
+const charsArray = (arr: ICharacter[]) => {
   findedChars.value = arr;
 };
 const finding = (data: boolean) => {
@@ -62,24 +58,26 @@ const finding = (data: boolean) => {
 const fetchData = async () => {
   const { data } = await axios.get<{
     info: { pages: number };
-    results: Character[];
+    results: ICharacter[];
   }>(`https://rickandmortyapi.com/api/character/?page=${currentPage.value}`);
   characters.value = data.results;
   maxPage.value = data.info.pages;
 };
 fetchData();
-const localSet = (data: Character[]) => {
-  localStorage.setItem("favoriteCharacters", JSON.stringify(data));
+const localSet = (data: ICharacter[]) => {
+  localStorage.setItem("favoriteICharacters", JSON.stringify(data));
 };
-const addToFavorites = ({ id, name, image }: Character) => {
-  const index = favoriteChars.value.findIndex((item) => item.id === id);
+
+const { getIndex } = useFindIndex();
+const addToFavorites = ({ id, name, image }: ICharacter) => {
+  const index = getIndex({ id, array: favoriteChars.value });
   if (index === -1) {
     favoriteChars.value.push({ id, name, image });
     localSet(favoriteChars.value);
   }
 };
 const removeFromFavorites = (id: number) => {
-  const index = favoriteChars.value.findIndex((item) => item.id === id);
+  const index = getIndex({ id, array: favoriteChars.value });
   if (index > -1) {
     favoriteChars.value.splice(index, 1);
     localSet(favoriteChars.value);

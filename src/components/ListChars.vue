@@ -3,7 +3,7 @@
     <div
       v-for="{ id, name, image } in props.characters"
       :key="id"
-      :class="isFav(id) ? 'favourite' : 'character'"
+      :class="{ favourite: isFav(id), character: true }"
       @click="
         isFav(id)
           ? props.removeFromFavorites(id)
@@ -19,15 +19,17 @@
 </template>
 
 <script setup lang="ts">
-import type { Character } from "./ContainerChars.vue";
+import type { ICharacter } from "@/interfaces/interfaces";
 import useName from "@/composables/useName";
+import useFindIndex from "@/composables/useFindIndex";
+
 const props = defineProps({
   characters: {
-    type: Array as () => Character[],
+    type: Array as () => ICharacter[],
     required: true,
   },
   favoriteChars: {
-    type: Array as () => Character[],
+    type: Array as () => ICharacter[],
     required: true,
   },
   addToFavorites: {
@@ -39,11 +41,12 @@ const props = defineProps({
     required: true,
   },
 });
-const isFav = (id: number) => {
-  return props.favoriteChars.findIndex((item) => item.id === id) > -1;
-};
+const { getIndex } = useFindIndex();
+const isFav = (id: number): boolean =>
+  getIndex({ id, array: props.favoriteChars }) > -1;
 const { cutName } = useName();
 </script>
+
 <style scoped>
 .characters {
   cursor: pointer;
@@ -57,8 +60,17 @@ const { cutName } = useName();
     min-height: 100vh;
   }
 }
-.character,
-.favourite {
+@keyframes ani {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+.character {
+  opacity: 0;
+  animation: ani 1.5s forwards;
   width: 28%;
   margin: 2%;
   text-align: center;
@@ -69,8 +81,7 @@ const { cutName } = useName();
   border-radius: 4%;
 }
 @media (min-width: 768px) {
-  .character,
-  .favourite {
+  .character {
     width: 21%;
     margin: 2%;
   }
@@ -86,7 +97,7 @@ const { cutName } = useName();
   width: 100%;
   border-radius: 5%;
 }
-.fav {
+.favourite {
   background-color: var(--vt-c-bgc-char-favourite);
   box-shadow: 0.3rem 0.3rem 20px var(--vt-c-bgc-char-favourite-shadow);
 }
@@ -105,6 +116,9 @@ const { cutName } = useName();
   color: var(--vt-c-text-heart);
 }
 .search-error {
+  opacity: 0;
+  animation: ani 1.5s forwards;
+  min-height: 90vh;
   text-align: center;
   color: var(--vt-c-text-error);
 }

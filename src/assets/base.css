@@ -17,7 +17,7 @@
 
   --vt-c-text-error: #7d4545;
   --vt-c-text-heart: red;
-  --vt-c-text-remove: #595959;
+  --vt-c-text-remove: #626262;
   --vt-c-text-remove-hover: black;
 }
 
@@ -32,7 +32,7 @@
 
 body {
   min-height: 100vh;
-  color: var(--color-text);
+  color: var(--vt-c-text-char);
   background-color: var(--vt-c-bgc-body);
   transition: color 0.5s, background-color 0.5s;
   line-height: 1.6;

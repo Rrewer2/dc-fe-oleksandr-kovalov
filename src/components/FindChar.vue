@@ -1,12 +1,12 @@
 <template>
-  <h3 class="find-title">Find the character:</h3>
-  <form class="search-form">
+  <h3 class="search-title">Find the character:</h3>
+  <form onsubmit="event.preventDefault()" class="search-form">
     <input
       class="search-input"
       type="text"
       v-model="query"
       placeholder="Enter name"
-      :onblur="errorClean"
+      :onblur="cleanError"
     />
     <button @click="cleanInput" class="search-input-clean">&times;</button>
   </form>
@@ -17,15 +17,15 @@
 <script setup lang="ts">
 import { ref, watchEffect, defineEmits } from "vue";
 import axios from "axios";
-import type { Character } from "./ContainerChars.vue";
+import type { ICharacter } from "@/interfaces/interfaces";
 
-const findedChars = ref<Character[]>([]);
+const findedChars = ref<ICharacter[]>([]);
 const emits = defineEmits(["charsArray", "finding"]);
 const query = ref("");
 const loading = ref(false);
 const err = ref(false);
 
-const errorClean = () => {
+const cleanError = () => {
   err.value = false;
 };
 const cleanInput = () => {
@@ -58,25 +58,25 @@ watchEffect(() => {
 </script>
 
 <style scoped>
-.find-title {
+.search-title {
   text-align: center;
   margin-top: 1rem;
   color: var(--vt-c-bgc-title);
 }
 @media (min-width: 640px) {
-  .find-title {
+  .search-title {
     font-size: 1.5rem;
   }
 }
 .search-form {
-  display: flex;
+  position: relative;
 }
 .search-input {
+  padding: 0.3rem;
   font-size: 1rem;
-  /* padding: 0.5rem; */
   border: 0.1rem solid #ccc;
   border-radius: 0.3rem;
-  width: 65%;
+  width: 90%;
   outline: none;
 }
 .search-input::placeholder {
@@ -98,12 +98,15 @@ watchEffect(() => {
   color: var(--vt-c-text-char);
 }
 .search-input-clean {
-  width: 15%;
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
   background: none;
   border: none;
   color: var(--vt-c-text-remove);
   cursor: pointer;
-  font-size: 200%;
+  font-size: 2rem;
 }
 
 .search-input-clean:hover {
