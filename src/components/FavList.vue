@@ -1,14 +1,19 @@
 <template>
   <h3 class="fav-title">Favorite Characters</h3>
   <article v-if="props.favoriteChars.length">
-    <div :class="props.favoriteChars.length < 6 ? 'fav-list' : 'fav-list-long'">
+    <div
+      class="fav-list"
+      :class="{ 'fav-list-long': props.favoriteChars.length > 6 }"
+    >
       <div
         v-for="{ id, name, image } in props.favoriteChars"
         :key="id"
         class="fav-item"
       >
         <img :src="image" :alt="name" />
-        <p class="fav-item-name">{{ cutName(name) }}</p>
+        <p class="fav-item-name">
+          {{ cutName({ str: name, maxNameLength: 19 }) }}
+        </p>
 
         <button @click="props.removeFromFavorites(id)" class="fav-remove">
           &times;
@@ -17,11 +22,12 @@
     </div>
   </article>
   <h3 v-else class="no-fav-chars">
-    You have no favorite characters. Select some to add to the list
+    You have no favorite characters. Select someone to add to the list
   </h3>
 </template>
 <script setup lang="ts">
 import type { Character } from "./ContainerChars.vue";
+import useName from "@/composables/useName";
 const props = defineProps({
   favoriteChars: {
     type: Array as () => Character[],
@@ -32,12 +38,7 @@ const props = defineProps({
     required: true,
   },
 });
-const cutName = (str: string): string => {
-  const maxNameLength = 19;
-  if (str.length > maxNameLength)
-    return str.slice(0, maxNameLength - 3) + "...";
-  return str;
-};
+const { cutName } = useName();
 </script>
 <style scoped>
 .fav-title {
@@ -52,6 +53,7 @@ const cutName = (str: string): string => {
 .fav-list {
   height: 20rem;
   width: 90%;
+  transition: 3s linear;
 }
 .fav-list-long {
   height: 20rem;

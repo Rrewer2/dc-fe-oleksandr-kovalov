@@ -8,7 +8,7 @@
       placeholder="Enter name"
       :onblur="errorClean"
     />
-    <button @click="cleanInput" class="input-clean">&times;</button>
+    <button @click="cleanInput" class="search-input-clean">&times;</button>
   </form>
   <p v-if="loading" class="search-loading">Loading...</p>
   <p v-else-if="err" class="search-error">Nothing found</p>
@@ -23,7 +23,7 @@ const findedChars = ref<Character[]>([]);
 const emits = defineEmits(["charsArray", "finding"]);
 const query = ref("");
 const loading = ref(false);
-const err = ref(true);
+const err = ref(false);
 
 const errorClean = () => {
   err.value = false;
@@ -44,9 +44,10 @@ watchEffect(() => {
         emits("charsArray", findedChars.value);
       })
       .catch(() => {
-        // console.log(error);
+        findedChars.value = [];
         err.value = true;
         loading.value = false;
+        emits("charsArray", findedChars.value);
       });
   } else {
     findedChars.value = [];
@@ -96,7 +97,7 @@ watchEffect(() => {
 .search-loading {
   color: var(--vt-c-text-char);
 }
-.input-clean {
+.search-input-clean {
   width: 15%;
   background: none;
   border: none;
@@ -105,10 +106,10 @@ watchEffect(() => {
   font-size: 200%;
 }
 
-.input-clean:hover {
+.search-input-clean:hover {
   color: var(--vt-c-text-remove-hover);
 }
-.input-clean:focus {
+.search-input-clean:focus {
   outline: none;
 }
 </style>

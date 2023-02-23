@@ -11,7 +11,7 @@
       "
     >
       <img class="image-container" :src="image" :alt="`${name} image`" />
-      <p class="char-name">{{ cutName(name) }}</p>
+      <p class="char-name">{{ cutName({ str: name, maxNameLength: 16 }) }}</p>
       <i v-if="isFav(id)" class="heart">♥</i>
     </div>
   </article>
@@ -20,6 +20,7 @@
 
 <script setup lang="ts">
 import type { Character } from "./ContainerChars.vue";
+import useName from "@/composables/useName";
 const props = defineProps({
   characters: {
     type: Array as () => Character[],
@@ -41,10 +42,7 @@ const props = defineProps({
 const isFav = (id: number) => {
   return props.favoriteChars.findIndex((item) => item.id === id) > -1;
 };
-const cutName = (str: string): string => {
-  if (str.length > 16) return str.slice(0, 13) + "...";
-  return str;
-};
+const { cutName } = useName();
 </script>
 <style scoped>
 .characters {
