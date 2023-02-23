@@ -1,38 +1,27 @@
 <template>
-  <div class="ContainerChars">
-    <div class="charsWrapper">
-      <div v-if="characters.length > 0">
-        <div v-if="!isFinding" class="buttons">
-          <button class="prev" @click="prevPage">←</button>
-          <div class="pageNumber">{{ currentPage }}</div>
-          <button class="next" @click="nextPage">→</button>
-        </div>
-        <div v-else class="searchResults">Search results:</div>
-        <ListChars
-          :characters="isFinding ? findedChars : characters"
-          :addToFavorites="addToFavorites"
-          :removeFromFavorites="removeFromFavorites"
-          :favoriteChars="favoriteChars"
-        />
-      </div>
-      <div v-else>
-        <p class="searchError">No characters found :(</p>
-      </div>
-    </div>
-    <div class="favAndFindWrapper">
-      <div class="favouriteTitle">Favorite Characters</div>
-      <div class="favItems">
-        <FavList
-          :favoriteChars="favoriteChars"
-          :removeFromFavorites="removeFromFavorites"
-        />
-      </div>
-      <div class="findTitle">Find the character:</div>
-      <div class="findWrapper">
-        <FindChar @fch="fch" @finding="finding" />
-      </div>
-    </div>
-  </div>
+  <main class="main">
+    <section class="chars-wrapper">
+      <h3 v-if="isFinding" class="search-results">Search results:</h3>
+      <nav v-else class="nav-buttons">
+        <button class="nav-btn" @click="prevPage">←</button>
+        <h3 class="page-number">{{ currentPage }}</h3>
+        <button class="nav-btn" @click="nextPage">→</button>
+      </nav>
+      <ListChars
+        :characters="isFinding ? findedChars : characters"
+        :addToFavorites="addToFavorites"
+        :removeFromFavorites="removeFromFavorites"
+        :favoriteChars="favoriteChars"
+      />
+    </section>
+    <section class="fav-find-wraper">
+      <FavList
+        :favoriteChars="favoriteChars"
+        :removeFromFavorites="removeFromFavorites"
+      />
+      <FindChar @charsArray="charsArray" @finding="finding" />
+    </section>
+  </main>
 </template>
 
 <script setup lang="ts">
@@ -64,44 +53,36 @@ if (storedChars) {
   }
 }
 
-const fch = (data: Character[]) => {
-  findedChars.value = data;
+const charsArray = (arr: Character[]) => {
+  findedChars.value = arr;
 };
 const finding = (data: boolean) => {
   isFinding.value = data;
 };
 const fetchData = async () => {
-  const response = await axios.get<{
+  const { data } = await axios.get<{
     info: { pages: number };
     results: Character[];
   }>(`https://rickandmortyapi.com/api/character/?page=${currentPage.value}`);
-  characters.value = response.data.results;
-  maxPage.value = response.data.info.pages;
+  characters.value = data.results;
+  maxPage.value = data.info.pages;
 };
 fetchData();
-
-const addToFavorites = (character: Character) => {
-  const newCharacter = favoriteChars.value.find((c) => c.id === character.id);
-  if (!newCharacter) {
-    favoriteChars.value.push({
-      id: character.id,
-      name: character.name,
-      image: character.image,
-    });
-    localStorage.setItem(
-      "favoriteCharacters",
-      JSON.stringify(favoriteChars.value)
-    );
+const localSet = (data: Character[]) => {
+  localStorage.setItem("favoriteCharacters", JSON.stringify(data));
+};
+const addToFavorites = ({ id, name, image }: Character) => {
+  const index = favoriteChars.value.findIndex((item) => item.id === id);
+  if (index === -1) {
+    favoriteChars.value.push({ id, name, image });
+    localSet(favoriteChars.value);
   }
 };
-const removeFromFavorites = (character: Character) => {
-  const index = favoriteChars.value.findIndex((c) => c.id === character.id);
+const removeFromFavorites = (id: number) => {
+  const index = favoriteChars.value.findIndex((item) => item.id === id);
   if (index > -1) {
     favoriteChars.value.splice(index, 1);
-    localStorage.setItem(
-      "favoriteCharacters",
-      JSON.stringify(favoriteChars.value)
-    );
+    localSet(favoriteChars.value);
   }
 };
 const nextPage = () => {
@@ -117,100 +98,69 @@ const prevPage = () => {
 </script>
 
 <style scoped>
-.ContainerChars {
-  width: 100%;
+.main {
+  margin: 0.5rem auto;
   display: flex;
-  align-items: flex-start;
+  /* column-gap: 0.5rem; */
 }
 @media (min-width: 1024px) {
-  .ContainerChars {
-    width: 1024px;
+  .main {
+    margin: 1rem 5rem;
   }
 }
-.charsWrapper {
+.chars-wrapper {
   width: 60%;
   padding-right: 0.5rem;
 }
-@media (min-width: 420px) {
-  .charsWrapper {
+@media (min-width: 640px) {
+  .chars-wrapper {
     width: 75%;
     padding-right: 0.5rem;
   }
 }
 @media (min-width: 1024px) {
-  .charsWrapper {
-    /* width: 75%; */
+  .chars-wrapper {
     padding-right: 2rem;
   }
 }
-.buttons {
+.fav-find-wraper {
+  width: 40%;
+}
+@media (min-width: 640px) {
+  .fav-find-wraper {
+    width: 25%;
+  }
+}
+.nav-buttons {
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.pageNumber {
+.page-number {
   width: 35%;
   text-align: center;
   margin: 0;
-  color: black;
+  color: var(--vt-c-text-char);
   font-weight: 500;
 }
-@media (min-width: 420px) {
-  .pageNumber {
+@media (min-width: 640px) {
+  .page-number {
     width: 10%;
   }
 }
-button {
+.nav-btn {
   border: none;
-  background-color: #4caf50;
-  color: white;
+  background-color: var(--vt-c-bgc-btn);
+  color: var(--vt-c-text-btn);
   padding: 0.1rem 1rem;
   border-radius: 0.2rem;
   cursor: pointer;
 }
-button.prev:active,
-button.next:active {
+.nav-btn:active {
   transform: translateY(0.02rem);
 }
-.searchResults {
+.search-results {
   text-align: center;
-  color: var(--vt-c-bgc-h1);
-}
-.searchError {
-  text-align: center;
-  color: #7d4545;
-}
-.favAndFindWrapper {
-  width: 40%;
-}
-@media (min-width: 420px) {
-  .favAndFindWrapper {
-    width: 25%;
-  }
-}
-.favouriteTitle {
-  width: 100%;
-  text-align: center;
-  color: var(--vt-c-bgc-h1);
-}
-@media (min-width: 670px) {
-  .favouriteTitle {
-    font-size: 1.5rem;
-  }
-}
-.favItems {
-  /* background-color: #fff;
-  border: 0.1rem solid #ccc;
-  border-radius: 0.3rem; */
-  width: 100%;
-  height: 20rem;
-}
-.findTitle {
-  text-align: center;
-  margin-top: 1rem;
-  color: var(--vt-c-bgc-h1);
-}
-.findWrapper {
-  width: 100%;
+  color: var(--vt-c-bgc-title);
 }
 </style>

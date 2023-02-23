@@ -1,25 +1,21 @@
 <template>
-  <div class="characters">
+  <article v-if="characters.length" class="characters">
     <div
-      v-for="char in props.characters"
-      :key="char.id"
-      :class="isFav(char) ? 'character fav' : 'character'"
+      v-for="{ id, name, image } in props.characters"
+      :key="id"
+      :class="isFav(id) ? 'favourite' : 'character'"
       @click="
-        isFav(char)
-          ? props.removeFromFavorites(char)
-          : props.addToFavorites(char)
+        isFav(id)
+          ? props.removeFromFavorites(id)
+          : props.addToFavorites({ id, name, image })
       "
     >
-      <div class="imageContainer">
-        <img :src="char.image" :alt="char.name + ' image'" />
-      </div>
-      <div class="charName">{{ cutName(char.name) }}</div>
-      <div>
-        <!-- <button @click="props.addToFavorites(char)">♥</button> -->
-      </div>
-      <div v-if="isFav(char)" class="heart">♥</div>
+      <img class="image-container" :src="image" :alt="`${name} image`" />
+      <p class="char-name">{{ cutName(name) }}</p>
+      <i v-if="isFav(id)" class="heart">♥</i>
     </div>
-  </div>
+  </article>
+  <h2 v-else class="search-error">No characters found :(</h2>
 </template>
 
 <script setup lang="ts">
@@ -42,8 +38,8 @@ const props = defineProps({
     required: true,
   },
 });
-const isFav = (char: Character) => {
-  return props.favoriteChars.findIndex((item) => item.id === char.id) > -1;
+const isFav = (id: number) => {
+  return props.favoriteChars.findIndex((item) => item.id === id) > -1;
 };
 const cutName = (str: string): string => {
   if (str.length > 16) return str.slice(0, 13) + "...";
@@ -56,44 +52,35 @@ const cutName = (str: string): string => {
   display: flex;
   flex-wrap: wrap;
   align-content: flex-start;
+  min-height: 90vh;
 }
 @media (min-width: 1024px) {
   .characters {
     min-height: 100vh;
   }
 }
-.character {
-  width: 42%;
+.character,
+.favourite {
+  width: 28%;
+  margin: 2%;
+  text-align: center;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  background-color: var(--vt-c-text-dark-2);
-  margin: 4%;
-  text-align: center;
+  background-color: var(--vt-c-bgc-char);
   border-radius: 4%;
 }
-@media (min-width: 420px) {
-  .character {
-    width: 28%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    background-color: var(--vt-c-text-dark-2);
-    margin: 2%;
-    text-align: center;
-    border-radius: 4%;
-  }
-}
 @media (min-width: 768px) {
-  .character {
+  .character,
+  .favourite {
     width: 21%;
     margin: 2%;
   }
 }
 .character:active {
-  background-color: #4caf50;
+  background-color: var(--vt-c-bgc-char-active);
 }
-.imageContainer {
+.image-container {
   width: 100%;
   height: 100%;
 }
@@ -102,21 +89,25 @@ const cutName = (str: string): string => {
   border-radius: 5%;
 }
 .fav {
-  background-color: rgb(222, 196, 132);
-  box-shadow: 0.3rem 0.3rem 20px rgba(222, 196, 132, 0.5);
+  background-color: var(--vt-c-bgc-char-favourite);
+  box-shadow: 0.3rem 0.3rem 20px var(--vt-c-bgc-char-favourite-shadow);
 }
-.charName {
+.char-name {
   font-size: 0.5rem;
   font-weight: bold;
-  color: black;
+  color: var(--vt-c-text-char);
 }
 @media (min-width: 768px) {
-  .charName {
+  .char-name {
     font-size: 1rem;
   }
 }
 .heart {
   position: absolute;
-  color: red;
+  color: var(--vt-c-text-heart);
+}
+.search-error {
+  text-align: center;
+  color: var(--vt-c-text-error);
 }
 </style>

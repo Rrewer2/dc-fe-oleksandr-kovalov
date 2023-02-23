@@ -1,26 +1,24 @@
 <template>
-  <div v-if="props.favoriteChars.length > 0" class="favContainer">
-    <div :class="props.favoriteChars.length < 8 ? 'favList' : 'favList-long'">
+  <h3 class="fav-title">Favorite Characters</h3>
+  <article v-if="props.favoriteChars.length">
+    <div :class="props.favoriteChars.length < 6 ? 'fav-list' : 'fav-list-long'">
       <div
-        v-for="favChar in props.favoriteChars"
-        :key="favChar.id"
-        class="favItem"
+        v-for="{ id, name, image } in props.favoriteChars"
+        :key="id"
+        class="fav-item"
       >
-        <div><img :src="favChar.image" :alt="favChar.name" /></div>
-        <div>
-          <div class="favItemName">{{ cutName(favChar.name) }}</div>
-        </div>
-        <div>
-          <button @click="props.removeFromFavorites(favChar)" class="remove">
-            &times;
-          </button>
-        </div>
+        <img :src="image" :alt="name" />
+        <p class="fav-item-name">{{ cutName(name) }}</p>
+
+        <button @click="props.removeFromFavorites(id)" class="fav-remove">
+          &times;
+        </button>
       </div>
     </div>
-  </div>
-  <div v-else>
-    <div class="noFavChars">You have no favorite characters.</div>
-  </div>
+  </article>
+  <h3 v-else class="no-fav-chars">
+    You have no favorite characters. Select some to add to the list
+  </h3>
 </template>
 <script setup lang="ts">
 import type { Character } from "./ContainerChars.vue";
@@ -35,66 +33,75 @@ const props = defineProps({
   },
 });
 const cutName = (str: string): string => {
-  if (str.length > 19) return str.slice(0, 16) + "...";
+  const maxNameLength = 19;
+  if (str.length > maxNameLength)
+    return str.slice(0, maxNameLength - 3) + "...";
   return str;
 };
 </script>
 <style scoped>
-.favContainer {
-  width: 100%;
+.fav-title {
+  text-align: center;
+  color: var(--vt-c-bgc-title);
 }
-.favList {
+@media (min-width: 640px) {
+  .fav-title {
+    font-size: 1.5rem;
+  }
+}
+.fav-list {
   height: 20rem;
   width: 90%;
 }
-.favList-long {
+.fav-list-long {
   height: 20rem;
   overflow-y: scroll;
 }
-.favItem {
+.fav-item {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
   text-align: center;
-  margin: 3px 0;
-  font-size: 10px;
+  margin: 0.1rem 0;
+  /* font-size: 1rem; */
 }
-.favItem img {
+.fav-item img {
   width: 2rem;
   height: 2rem;
   border-radius: 1rem;
 }
-.favItemName {
+.fav-item-name {
   font-weight: bold;
-  color: #000000;
+  font-size: 0.75rem;
+  color: var(--vt-c-text-char);
 }
-@media (min-width: 768px) {
-  .favItemName {
+@media (min-width: 640px) {
+  .fav-item-name {
     font-size: 1rem;
   }
 }
-.remove {
+.fav-remove {
   background: none;
   border: none;
-  color: #595959;
+  color: var(--vt-c-text-remove);
   cursor: pointer;
   font-size: 300%;
 }
 
-.remove:hover {
-  color: #000000;
+.fav-remove:hover {
+  color: var(--vt-c-text-remove-hover);
 }
-.remove:focus {
+.fav-remove:focus {
   outline: none;
 }
-.noFavChars {
+.no-fav-chars {
   padding-top: 1rem;
   font-size: 0.75rem;
-  color: #7d4545;
+  color: var(--vt-c-text-error);
 }
 @media (min-width: 768px) {
-  .noFavChars {
+  .no-fav-chars {
     font-size: 1rem;
   }
 }
