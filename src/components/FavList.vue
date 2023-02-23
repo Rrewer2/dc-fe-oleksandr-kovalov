@@ -4,7 +4,7 @@
     <div
       class="fav-list"
       :class="{
-        'fav-list-long': props.favoriteChars.length > maxFavLength,
+        'fav-list-long': props.favoriteChars.length >= maxFavLength,
       }"
     >
       <div
